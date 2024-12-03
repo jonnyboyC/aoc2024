@@ -1,0 +1,41 @@
+import std.io.fs:{readFile};
+import std.math:{abs};
+
+type Pairs = list<list<number>>;
+
+fn read(path: str) -> Pairs { 
+  let left = [];
+  let right = [];
+
+  for line in readFile(path).split('\n') { 
+    let nums = line.split('   ').map(Number.parse).list();
+    left.push(nums[0]);
+    right.push(nums[1]);
+  }
+
+  [left, right]
+}
+
+fn part1(pairs: Pairs) -> number { 
+  let sorted_left = pairs[0].sort(Number.cmp);
+  let sorted_right = pairs[1].sort(Number.cmp);
+
+  sorted_left.iter().zip(sorted_right.iter()).reduce(0, |total, pair| total + abs(pair[0] - pair[1]))
+}
+
+fn part2(pairs: Pairs) -> number { 
+  let counts = {};
+  for item in pairs[1] { 
+    if !counts.has(item) { 
+      counts[item] = 1;
+    } else { 
+      counts[item] += 1;
+    }
+  }
+
+  pairs[0].iter().reduce(0, |total, item| total + item * (counts.get(item) || 0))
+}
+
+let pairs = read("data.txt");
+print(part1(pairs));
+print(part2(pairs));
