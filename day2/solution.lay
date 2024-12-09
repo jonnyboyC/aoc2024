@@ -1,0 +1,76 @@
+import std.io.fs:{readFile};
+import std.math:{abs, max, min};
+
+fn change(l1, l2) { 
+  max(min(l2 - l1, 1), -1)
+}
+
+fn withinTolerance(l1, l2) { 
+  let diff = abs(l1 - l2);
+  diff >= 1 && diff <= 3
+}
+
+fn safe(levels) -> number { 
+  if levels.len() <= 1 { true; }
+
+  let direction = change(levels[0], levels[1]);
+
+  for pairs in levels
+    .slice(0, levels.len() - 1)
+    .iter()
+    .zip(levels.slice(1, levels.len()).iter()) { 
+
+    let currentDriection = change(pairs[0], pairs[1]);
+
+    if direction != currentDriection || currentDriection == same || !withinTolerance(pairs[0], pairs[1]) { 
+      return false;
+    }
+  }
+
+  true
+}
+
+class Report { 
+  init(levels: list<number>) { 
+    @levels = levels;
+  }
+
+  safe() {
+    safe(@levels)
+  }
+
+  less_safe() {
+    if @safe() { return true; }
+
+    for i in @levels.len().times() { 
+      let levels = @levels.slice(0, i).iter().chain(@levels.slice(i + 1).iter()).list();
+
+      if safe(levels) { return true; }
+    }
+
+    false
+  }
+
+  str() { 
+    "safe ${self.safe()} ${@levels}"
+  }
+}
+
+fn read(path: str) -> list<Report> { 
+  readFile(path)
+    .split('\n')
+    .map(|line| Report(line.split(' ').map(Number.parse).list()))
+    .list()
+}
+
+fn part1(reports: list<Report>) -> number { 
+  reports.iter().filter(|r| r.safe()).len()
+}
+
+fn part2(pairs: Pairs) -> number { 
+  reports.iter().filter(|r| r.less_safe()).len()
+}
+
+let reports = read("data.txt");
+print(part1(reports));
+print(part2(reports));
